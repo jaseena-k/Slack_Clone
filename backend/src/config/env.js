@@ -1,4 +1,4 @@
-import dotenv from 'dotenv/config'
+import 'dotenv/config'
 
 export const ENV = {
     PORT : process.env.PORT || 5001,

@@ -1,8 +1,5 @@
-
 import express from "express"
-import dotenv from "dotenv"
-import { ENV } from "./config/env"
-dotenv.config()
+import { ENV } from "./config/env.js"
 
 const app = express()
 app.get("/",(req,res)=>{
@@ -12,3 +9,7 @@ app.get("/",(req,res)=>{
 })
 
 app.listen(ENV.PORT,()=> console.log ("server started on port",ENV.PORT))
+
+
+// ctHoeUXzDXo7AqSx
+// jaseenajas596_db_user
