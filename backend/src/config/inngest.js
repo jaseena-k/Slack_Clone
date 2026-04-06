@@ -1,5 +1,6 @@
 import { Inngest } from "inngest";
-import { connectDB } from "./db";
+import { connectDB } from "./db.js";
+import { User } from "../models/user.model.js";
 
 // Create a client to send and receive events
 export const inngest = new Inngest({ id:"slack-clone" });
@@ -21,14 +22,14 @@ const syncUser =inngest.createFunction(
     }
         ) 
 
-        deleteUserFromDb = inngest.createFunction(
-            {id:"delete-user-from-db"},
-            {event:"clerk/user.deleted"},
-            async({event})=>{
-                const {id} =event.data
-                await User.deleteOne({clerkId:id})
-            }
-        )
+const deleteUserFromDb = inngest.createFunction(
+    {id:"delete-user-from-db"},
+    {event:"clerk/user.deleted"},
+    async({event})=>{
+        const {id} =event.data
+        await User.deleteOne({clerkId:id})
+    }
+)
 
     
 

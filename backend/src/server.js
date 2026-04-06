@@ -1,8 +1,9 @@
 import express from "express"
-import { ENV } from "../config/env.js"
-import { connectDB } from "../config/db.js"
+import { ENV } from "./config/env.js"
+import { connectDB } from "./config/db.js"
 import { clerkMiddleware } from '@clerk/express'
-import { inngest, functions } from "./src/inngest"
+import { inngest, functions} from "../src/config/inngest.js"
+import { serve } from "inngest/express";
 
 
 const app = express()
@@ -14,12 +15,20 @@ app.get("/",(req,res)=>{
     console.log("mongoose url",ENV.DB_URL)
 
 })
+const startServer = async ()=>{
+    try{
+        await connectDB();
+        if(ENV.NODE_ENV !=="production"){
+            app.listen(ENV.PORT,()=>{
+            console.log ("server started on port",ENV.PORT)
+        })
+    }
 
-app.listen(ENV.PORT,()=>{
-    console.log ("server started on port",ENV.PORT)
-    connectDB();
-})
+    }catch(error){
+        console.log("error starting server ",error);
+    }
 
+}
+startServer()
 
-// ctHoeUXzDXo7AqSx
-// jaseenajas596_db_user
+export default app;
