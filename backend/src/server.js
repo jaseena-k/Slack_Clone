@@ -5,11 +5,17 @@ import { clerkMiddleware } from '@clerk/express'
 import { inngest, functions} from "../src/config/inngest.js"
 import { serve } from "inngest/express";
 import chatRoutes from "./routes/chat.route.js"
+import "../instrument.mjs"
 
+import * as Sentry from "@sentry/node"
 
 const app = express()
 app.use(express.json())
 app.use(clerkMiddleware())
+
+app.get("/debug-sentry",(req,res)=>{
+    throw new Error("my first sentry error")
+})
 app.get("/",(req,res)=>{
     res.send("Hello World!!")
     console.log("mongoose url",ENV.DB_URL)
@@ -18,6 +24,7 @@ app.get("/",(req,res)=>{
 
 app.use("/api/inngest", serve({ client: inngest, functions }));
 app.use("/api/chat",chatRoutes);
+Sentry.setupExpressErrorHandler(app)
 
 
 const startServer = async ()=>{
