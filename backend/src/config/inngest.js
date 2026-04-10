@@ -11,11 +11,28 @@ const syncUser =inngest.createFunction(
     async({event})=>{
         await connectDB()
 
-        const {id,email_address,first_name,last_name,image_url} =event.data;
+        const {
+            id,
+            email_addresses = [],
+            primary_email_address_id,
+            first_name,
+            last_name,
+            image_url
+        } = event.data;
+
+        const primaryEmail =
+            email_addresses.find(
+                (email) => email.id === primary_email_address_id
+            )?.email_address ?? email_addresses[0]?.email_address;
+
+        if (!primaryEmail) {
+            throw new Error(`No email address found for Clerk user ${id}`);
+        }
+
         const newUser={
             clerkId :id,
-            email:email_address[0]?.email_address,
-            name:`${first_name || ""}${last_name || ""}`,
+            email:primaryEmail,
+            name:[first_name, last_name].filter(Boolean).join(" ") || primaryEmail,
             image:image_url
         }
         await User.create(newUser)
@@ -37,7 +54,7 @@ const deleteUserFromDb = inngest.createFunction(
         const {id} =event.data
         await User.deleteOne({clerkId:id})
 
-        await deleteStreamUser(id.toString)
+        await deleteStreamUser(id.toString())
 
         
     }
