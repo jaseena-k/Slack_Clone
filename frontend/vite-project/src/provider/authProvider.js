@@ -25,12 +25,12 @@ export default function AuthProvider({ children }) {
       },
       (error) => {
         console.error("Axios request error:", error)
-        return Promise.reject(error);
+        return Promise.reject(error)
       }
     );
 
     return () => axiosInstance.interceptors.request.eject(interceptor)
-  }, [getToken])
+  },[getToken])
 
   return <AuthContext.Provider value={{}}>{children}</AuthContext.Provider>
 }
