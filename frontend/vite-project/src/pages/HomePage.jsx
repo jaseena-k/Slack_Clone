@@ -1,12 +1,71 @@
 import React from 'react'
 import { UserButton } from '@clerk/clerk-react'
+import { useSearchParams } from 'react-router'
+import { useState, useEffect } from 'react'
+import { useStreamChat } from '../hooks/useStreamChat'
+import {
+  Chat,
+  Channel,
+  ChannelList,
+  MessageList,
+  MessageInput,
+  Thread,
+  Window,
+} from "stream-chat-react";
+import "../style/stream-chat-theme.css"
+import PageLoader from '../components/pageLoader'
+import { HashIcon, PlusIcon, UsersIcon } from "lucide-react";
+import CreateChannelModel from '../components/createChannelModel'
+
 
 const HomePage = () => {
-  return (
-    <div className="bg-red-500">
+  const [isCreateModelOpen, setIsCreateModalOpen] = useState(false)
+  const [activeCHannel, setActiveChannel] = useState(null)
+  const [searchParams, setSearchParams] = useSearchParams()
 
-      <UserButton/>
-      Home page
+  const { chatClient, isLoading, error } = useStreamChat()
+
+  useEffect(() => {
+    if (chatClient) {
+      const channelId = searchParams.get("channel")
+      if (channelId) {
+        const channel = chatClient.channel("messaging", channelId)
+        setActiveChannel(channel)
+      }
+    }
+  }, [chatClient, searchParams])
+  if (error) return <p>"something went wrong..."</p>
+  if (isLoading || !chatClient) return <PageLoader />
+  return (
+    <div className="chat-wrapper">
+      <Chat client={chatClient}>
+        <div className='chat-container'>
+          <div className='str-chat__channel-list'>
+            <div className='team-channel-list'>
+              <div className='team-channel-list__header gap-4'>
+                <img src="/public/logo.png" alt="Logo" className='brand-logo' />
+                <span className='brand-name'>Slap</span>
+
+              </div>
+              <div className='user-button-wrapper'>
+                <UserButton />
+              </div>
+              <div className="create-channel-section">
+                <button onClick={() => setIsCreateModalOpen(true)} className="create-channel-btn">
+                  <PlusIcon className="size-4" />
+                  <span>Create Channel</span>
+                </button>
+              </div>
+
+            </div>
+
+
+
+          </div>
+
+        </div>
+        {isCreateModelOpen && <CreateChannelModel onClose={() => setIsCreateModalOpen(false)} />}
+      </Chat>
     </div>
   )
 }
