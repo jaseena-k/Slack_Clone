@@ -226,7 +226,6 @@ console.log("here2");
             </div>
           </div>
 
-          {/* add members component */}
           {channelType === "private" && (
             <div className="form-group">
               <label>Add members</label>
@@ -288,8 +287,7 @@ console.log("here2");
               rows={3}
             />
           </div>
-
-          {/* Actions */}
+          
           <div className="create-channel-modal__actions">
             <button type="button" onClick={onClose} className="btn btn-secondary">
               Cancel
