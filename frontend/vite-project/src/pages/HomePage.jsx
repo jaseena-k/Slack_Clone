@@ -16,11 +16,13 @@ import "../style/stream-chat-theme.css"
 import PageLoader from '../components/pageLoader'
 import { HashIcon, PlusIcon, UsersIcon } from "lucide-react";
 import CreateChannelModel from '../components/createChannelModel'
+import CustomChannelPreview from '../components/customChannelPreview'
+import { UsersList } from '../components/UsersList.jsx'
 
 
 const HomePage = () => {
   const [isCreateModelOpen, setIsCreateModalOpen] = useState(false)
-  const [activeCHannel, setActiveChannel] = useState(null)
+  const [activeChannel, setActiveChannel] = useState(null)
   const [searchParams, setSearchParams] = useSearchParams()
 
   const { chatClient, isLoading, error } = useStreamChat()
@@ -56,6 +58,40 @@ const HomePage = () => {
                   <span>Create Channel</span>
                 </button>
               </div>
+              <ChannelList
+                filters={{ members: { $in: [chatClient?.user?.id] } }}
+                options={{ state: true, watch: true }}
+                Preview={({ channel }) => (
+                  <CustomChannelPreview
+                    channel={channel}
+                    activeChannel={activeChannel}
+                    setActiveChannel={(channel) => setSearchParams({ channel: channel.id })}
+
+                  />
+
+                )}
+                List ={({children,loading,error})=>(
+                  <div className="channel-sections">
+                    <div className="section-header">
+                      <div className="section-title">
+                        <HashIcon className='size-4'/>
+                        <span>CHANNELS</span>
+                      </div>
+                    </div>
+                    {loading && <div className='loading-message'>Loading channels...</div>}
+                    {error && <div className='error-message'>Error Loading channels...</div>}
+
+                    <div className="channels-list">{children}</div>
+                    <div className='section-header direct-message'>
+                      <div className="section-title">
+                        <UsersIcon className='size-4'/>
+                        <span>Direct Message</span>
+                      </div>
+                    </div>
+                    <UsersList activeChannel={activeChannel}/>
+                  </div>
+                )}
+              />
 
             </div>
 
