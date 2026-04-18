@@ -1,28 +1,30 @@
-import { useEffect, useState } from "react";
-import { useSearchParams } from "react-router";
-import { useChatContext } from "stream-chat-react";
-import * as Sentry from "@sentry/react";
-import toast from "react-hot-toast";
-import { AlertCircleIcon, HashIcon, LockIcon, UsersIcon, XIcon } from "lucide-react";
+import { useEffect, useState } from "react"
+import { useSearchParams } from "react-router"
+import { useChatContext } from "stream-chat-react"
+import * as Sentry from "@sentry/react"
+import toast from "react-hot-toast"
+import { AlertCircleIcon, HashIcon, LockIcon, UsersIcon, XIcon } from "lucide-react"
 
 const CreateChannelModal = ({ onClose }) => {
-  const [channelName, setChannelName] = useState("");
-  const [channelType, setChannelType] = useState("public");
-  const [description, setDescription] = useState("");
-  const [isCreating, setIsCreating] = useState(false);
-  const [error, setError] = useState("");
-  const [users, setUsers] = useState([]);
-  const [selectedMembers, setSelectedMembers] = useState([]);
-  const [loadingUsers, setLoadingUsers] = useState(false);
-  const [_, setSearchParams] = useSearchParams();
 
-  const { client, setActiveChannel } = useChatContext();
+  const [channelName, setChannelName] = useState("")
+  const [channelType, setChannelType] = useState("public")
+  const [description, setDescription] = useState("")
+  const [isCreating, setIsCreating] = useState(false)
+  const [error, setError] = useState("")
+  const [users, setUsers] = useState([])
+  const [selectedMembers, setSelectedMembers] = useState([])
+  const [loadingUsers, setLoadingUsers] = useState(false)
+  const [_, setSearchParams] = useSearchParams()
+
+  const { client, setActiveChannel } = useChatContext()
 
   // fetch users for member selection
   useEffect(() => {
     const fetchUsers = async () => {
-      if (!client?.user) return;
-      setLoadingUsers(true);
+      if (!client?.user) return 
+
+      setLoadingUsers(true)
 
       try {
         const response = await client.queryUsers(
@@ -31,25 +33,24 @@ const CreateChannelModal = ({ onClose }) => {
           { limit: 100 }
         );
 
-        const usersOnly = response.users.filter((user) => !user.id.startsWith("recording-"));
+        const usersOnly = response.users.filter((user) => !user.id.startsWith("recording-"))
 
-        setUsers(usersOnly || []);
+        setUsers(usersOnly || [])
       } catch (error) {
-        console.log("Error fetching users");
+        console.log("Error fetching users")
         Sentry.captureException(error, {
           tags: { component: "CreateChannelModal" },
           extra: { context: "fetch_users_for_channel" },
         });
-        setUsers([]);
+        setUsers([])
       } finally {
-        setLoadingUsers(false);
+        setLoadingUsers(false)
       }
     };
 
     fetchUsers();
   }, [client]);
 
-  // reset the form on open: this is not needed, we just deleted it later in the video
   // useEffect(() => {
   //   setChannelName("");
   //   setDescription("");
@@ -58,11 +59,10 @@ const CreateChannelModal = ({ onClose }) => {
   //   setSelectedMembers([]);
   // }, []);
 
-  // auto-select all users for public channels
   useEffect(() => {
-    if (channelType === "public") setSelectedMembers(users.map((u) => u.id));
-    else setSelectedMembers([]);
-  }, [channelType, users]);
+    if (channelType === "public") setSelectedMembers(users.map((u) => u.id))
+    else setSelectedMembers([])
+  }, [channelType, users])
 
   const validateChannelName = (name) => {
     if (!name.trim()) return "Channel name is required";
@@ -72,15 +72,16 @@ const CreateChannelModal = ({ onClose }) => {
     return "";
   };
 
+
   const handleChannelNameChange = (e) => {
     const value = e.target.value;
     setChannelName(value);
-    setError(validateChannelName(value));
+    setError(validateChannelName(value))
   };
 
   const handleMemberToggle = (id) => {
     if (selectedMembers.includes(id)) {
-      setSelectedMembers(selectedMembers.filter((uid) => uid !== id));
+      setSelectedMembers(selectedMembers.filter((uid) => uid !== id))
     } else {
       setSelectedMembers([...selectedMembers, id]);
     }
@@ -88,16 +89,15 @@ const CreateChannelModal = ({ onClose }) => {
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    const validationError = validateChannelName(channelName);
-    if (validationError) return setError(validationError);
+    const validationError = validateChannelName(channelName)
+    if (validationError) return setError(validationError)
 
-    if (isCreating || !client?.user) return;
+    if (isCreating || !client?.user) return
 
-    setIsCreating(true);
-    setError("");
+    setIsCreating(true)
+    setError("")
 
     try {
-      // MY COOL CHANNEL !#1 => my-cool-channel-1
       const channelId = channelName
         .toLowerCase()
         .trim()
@@ -105,7 +105,6 @@ const CreateChannelModal = ({ onClose }) => {
         .replace(/[^a-z0-9-_]/g, "")
         .slice(0, 20);
 
-      // prepare the channel data
 console.log("here5");
       const channelData = {
         name: channelName.trim(),
@@ -131,14 +130,14 @@ console.log("here2");
       setActiveChannel(channel);
       setSearchParams({ channel: channelId });
 
-      toast.success(`Channel "${channelName}" created successfully!`);
+      toast.success(`Channel "${channelName}" created successfully!`)
       onClose();
     } catch (error) {
-      console.log("Error creating the channel", error);
+      console.log("Error creating the channel", error)
     } finally {
-      setIsCreating(false);
+      setIsCreating(false)
     }
-  };
+  }
 
   return (
     <div className="create-channel-modal-overlay">
@@ -150,7 +149,6 @@ console.log("here2");
           </button>
         </div>
 
-        {/* form */}
         <form onSubmit={handleSubmit} className="create-channel-modal__form">
           {error && (
             <div className="form-error">
@@ -159,7 +157,6 @@ console.log("here2");
             </div>
           )}
 
-          {/* Channel name */}
           <div className="form-group">
             <div className="input-with-icon">
               <HashIcon className="w-4 h-4 input-icon" />
@@ -175,7 +172,6 @@ console.log("here2");
               />
             </div>
 
-            {/* channel id  preview */}
             {channelName && (
               <div className="form-hint">
                 Channel ID will be: #
@@ -189,6 +185,7 @@ console.log("here2");
 
           {/* CHANNEL TYPE */}
           <div className="form-group">
+
             <label>Channel type</label>
 
             <div className="radio-group">
@@ -199,6 +196,7 @@ console.log("here2");
                   checked={channelType === "public"}
                   onChange={(e) => setChannelType(e.target.value)}
                 />
+                
                 <div className="radio-content">
                   <HashIcon className="size-4" />
                   <div>
@@ -275,7 +273,6 @@ console.log("here2");
             </div>
           )}
 
-          {/* Description */}
           <div className="form-group">
             <label htmlFor="description">Description (optional)</label>
             <textarea
