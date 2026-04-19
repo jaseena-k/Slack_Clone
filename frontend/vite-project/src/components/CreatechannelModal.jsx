@@ -51,13 +51,7 @@ const CreateChannelModal = ({ onClose }) => {
     fetchUsers();
   }, [client]);
 
-  // useEffect(() => {
-  //   setChannelName("");
-  //   setDescription("");
-  //   setChannelType("public");
-  //   setError("");
-  //   setSelectedMembers([]);
-  // }, []);
+  
 
   useEffect(() => {
     if (channelType === "public") setSelectedMembers(users.map((u) => u.id))
@@ -183,7 +177,6 @@ console.log("here2");
             )}
           </div>
 
-          {/* CHANNEL TYPE */}
           <div className="form-group">
 
             <label>Channel type</label>
@@ -196,7 +189,7 @@ console.log("here2");
                   checked={channelType === "public"}
                   onChange={(e) => setChannelType(e.target.value)}
                 />
-                
+
                 <div className="radio-content">
                   <HashIcon className="size-4" />
                   <div>
