@@ -16,7 +16,8 @@ export const UsersList = ({activeChannel}) => {
             {limit:20}
             
         )
-        return response.users
+        const usersOnly =response.users.filter((user)=>!user.id.startsWith("recording-"))
+        return usersOnly
     },[client])
     const {data:users =[],
         isLoading,
