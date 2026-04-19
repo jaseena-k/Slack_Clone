@@ -11,7 +11,7 @@ import * as Sentry from "@sentry/node"
 
 const allowedOrigins = [
   "http://localhost:5173",
-  "https://slack-clone-frontend-puce.vercel.app/"
+  "https://slack-clone-frontend-puce.vercel.app"
 ];
 
 
